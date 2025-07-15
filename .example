@@ -1,0 +1,4 @@
+PORT=8080
+APP_NAME=PFBackend
+ENV=production
+DB_URL=postgres://user:pass@localhost:5432/dbname

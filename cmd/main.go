@@ -1,42 +1,77 @@
 package main
 
 import (
+	"context"
+	"net/http"
 	"os"
+	"os/signal"
+	"time"
 
 	"github.com/Cenzios/pf-backend/config"
-	"github.com/Cenzios/pf-backend/internal/user"
+	"github.com/Cenzios/pf-backend/internal/routes"
 	"github.com/Cenzios/pf-backend/middleware"
 	"github.com/Cenzios/pf-backend/pkg/db"
+	"github.com/Cenzios/pf-backend/pkg/firebase"
 	"github.com/Cenzios/pf-backend/pkg/logger"
-	"github.com/gin-gonic/gin"
+	"github.com/Cenzios/pf-backend/pkg/smtp"
+	"github.com/Cenzios/pf-backend/seed"
 )
 
 func main() {
-	config.LoadEnv()
+	// Load config
+	cfg := config.LoadConfig()
+
+	// Initialize logger
 	logger.Init()
 
-	// Set Gin mode based on environment variable
-	if ginMode := os.Getenv("GIN_MODE"); ginMode != "" {
-		gin.SetMode(ginMode)
-	} else {
-		gin.SetMode(gin.ReleaseMode) // Default to release mode
+	// Initialize database and cache (auto-selects backend based on env)
+	db.Init()
+
+	// Initialize firebase
+	firebase.Init()
+
+	// Initialize smtp
+	smtp.Init()
+
+	// Seed Data
+	seed.Init()
+
+	// Register router
+	router := routes.RegisterRoutes()
+
+	// Apply middleware
+	handler := middleware.Init(router)
+
+	// Setup server
+	srv := &http.Server{
+		Addr:         ":" + cfg.Port,
+		Handler:      handler,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
 	}
-	r := gin.New()
-	// Initialize database connection
-	db.ConnectMongoDB()
 
-	// Set up middleware
-	r.Use(gin.Recovery())
-	r.Use(middleware.CORSMiddleware())
-	r.Use(middleware.CustomLogger())
+	// Start server
+	go func() {
+		logger.Info.Printf("🚀 Server running on port %s", cfg.Port)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Error.Fatalf("Listen error: %v", err)
+		}
+	}()
 
-	r.GET("/api/v1/user", user.GetProfile)
+	// Graceful shutdown
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+	logger.Info.Println("🛑 Shutting down server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		logger.Error.Fatalf("Server Shutdown Failed: %v", err)
 	}
 
-	logger.Log.Infof("Server running on port %s", port)
-	r.Run(":" + port)
+	logger.Info.Println("✅ Server exited cleanly")
 }

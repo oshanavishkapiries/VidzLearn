@@ -18,15 +18,41 @@ coverage.*
 profile.cov
 
 # Dependency directories (remove the comment below to include it)
-# vendor/
+vendor/
 
 # Go workspace file
 go.work
 go.work.sum
 
 # env file
-.env
+# .env
 
 # Editor/IDE
-# .idea/
-# .vscode/
+.idea/
+.vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Build and temp folders
+bin/
+build/
+dist/
+tmp/
+logs/
+
+# Log files
+*.log
+
+# Large files
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+*.bak
+*.tmp
+
+# Application binary
+PFBackend

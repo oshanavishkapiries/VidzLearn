@@ -1,7 +1,0 @@
-PORT=8080
-APP_NAME=PFBackend
-ENV=production
-GIN_MODE=release
-
-MONGO_URI=mongodb://localhost:27017
-MONGO_DB=myappdb

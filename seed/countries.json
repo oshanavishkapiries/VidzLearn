@@ -1,0 +1,122 @@
+[
+    {
+        "country_name": "Sri Lanka",
+        "country_symbol": "LK",
+        "country_code": "+94",
+        "dial_code": "+94"
+    },
+    {
+        "country_name": "India",
+        "country_symbol": "IN",
+        "country_code": "+91",
+        "dial_code": "+91"
+    },
+    {
+        "country_name": "United States",
+        "country_symbol": "US",
+        "country_code": "+1",
+        "dial_code": "+1"
+    },
+    {
+        "country_name": "United Kingdom",
+        "country_symbol": "GB",
+        "country_code": "+44",
+        "dial_code": "+44"
+    },
+    {
+        "country_name": "Canada",
+        "country_symbol": "CA",
+        "country_code": "+1",
+        "dial_code": "+1"
+    },
+    {
+        "country_name": "Australia",
+        "country_symbol": "AU",
+        "country_code": "+61",
+        "dial_code": "+61"
+    },
+    {
+        "country_name": "Germany",
+        "country_symbol": "DE",
+        "country_code": "+49",
+        "dial_code": "+49"
+    },
+    {
+        "country_name": "France",
+        "country_symbol": "FR",
+        "country_code": "+33",
+        "dial_code": "+33"
+    },
+    {
+        "country_name": "Japan",
+        "country_symbol": "JP",
+        "country_code": "+81",
+        "dial_code": "+81"
+    },
+    {
+        "country_name": "China",
+        "country_symbol": "CN",
+        "country_code": "+86",
+        "dial_code": "+86"
+    },
+    {
+        "country_name": "South Korea",
+        "country_symbol": "KR",
+        "country_code": "+82",
+        "dial_code": "+82"
+    },
+    {
+        "country_name": "Singapore",
+        "country_symbol": "SG",
+        "country_code": "+65",
+        "dial_code": "+65"
+    },
+    {
+        "country_name": "United Arab Emirates",
+        "country_symbol": "AE",
+        "country_code": "+971",
+        "dial_code": "+971"
+    },
+    {
+        "country_name": "Saudi Arabia",
+        "country_symbol": "SA",
+        "country_code": "+966",
+        "dial_code": "+966"
+    },
+    {
+        "country_name": "South Africa",
+        "country_symbol": "ZA",
+        "country_code": "+27",
+        "dial_code": "+27"
+    },
+    {
+        "country_name": "Brazil",
+        "country_symbol": "BR",
+        "country_code": "+55",
+        "dial_code": "+55"
+    },
+    {
+        "country_name": "Russia",
+        "country_symbol": "RU",
+        "country_code": "+7",
+        "dial_code": "+7"
+    },
+    {
+        "country_name": "New Zealand",
+        "country_symbol": "NZ",
+        "country_code": "+64",
+        "dial_code": "+64"
+    },
+    {
+        "country_name": "Bangladesh",
+        "country_symbol": "BD",
+        "country_code": "+880",
+        "dial_code": "+880"
+    },
+    {
+        "country_name": "Pakistan",
+        "country_symbol": "PK",
+        "country_code": "+92",
+        "dial_code": "+92"
+    }
+]

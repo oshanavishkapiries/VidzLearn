@@ -15,3 +15,4 @@ dev:
 	air -c ./.air.toml
 
 run: start
+

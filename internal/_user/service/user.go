@@ -13,10 +13,10 @@ import (
 	"github.com/Cenzios/pf-backend/pkg/utils"
 )
 
-func RegisterUserService(dto dto.RegisterUserDTO) (*mongo.User, error) {
+func RegisterUserService(userDTO dto.RegisterUserDTO) (*mongo.User, error) {
 	// 1. Check if user exists
 	filter := map[string]interface{}{
-		"email":     strings.ToLower(dto.Email),
+		"email":     strings.ToLower(userDTO.Email),
 		"is_active": true,
 	}
 	existingUser, err := db.DB.FindOne(context.Background(), "users", filter)
@@ -31,13 +31,13 @@ func RegisterUserService(dto dto.RegisterUserDTO) (*mongo.User, error) {
 	now := time.Now().Format(time.RFC3339)
 
 	user := &mongo.User{
-		Email:             &dto.Email,
-		SignUpVia:         dto.SignUpVia,
-		GoogleID:          &dto.GoogleID,
-		AppleID:           &dto.AppleID,
-		PushID:            &dto.PushID,
-		IpAddress:         &dto.IpAddress,
-		DeviceID:          &dto.DeviceID,
+		Email:             &userDTO.Email,
+		SignUpVia:         userDTO.SignUpVia,
+		GoogleID:          &userDTO.GoogleID,
+		AppleID:           &userDTO.AppleID,
+		PushID:            &userDTO.PushID,
+		IpAddress:         &userDTO.IpAddress,
+		DeviceID:          &userDTO.DeviceID,
 		IsAccountVerified: true,
 		IsActive:          true,
 		CreatedAt:         &now,
@@ -49,10 +49,10 @@ func RegisterUserService(dto dto.RegisterUserDTO) (*mongo.User, error) {
 	return user, nil
 }
 
-func RequestOtpService(dto dto.RequestOtpDTO) error {
+func RequestOtpService(otpDTO dto.RequestOtpDTO) error {
 	// 1. Check if user exists
 	filter := map[string]interface{}{
-		"email":     strings.ToLower(dto.Email),
+		"email":     strings.ToLower(otpDTO.Email),
 		"is_active": true,
 	}
 	userDoc, err := db.DB.FindOne(context.Background(), "users", filter)
@@ -91,11 +91,11 @@ func RequestOtpService(dto dto.RequestOtpDTO) error {
 	}
 
 	// 4. Send email (HTML)
-	htmlBody, err := utils.SendOtpEmail(dto.Email, otp)
+	htmlBody, err := utils.SendOtpEmail(otpDTO.Email, otp)
 	if err != nil {
 		return response.InternalServerException("Failed to generate OTP email body", err)
 	}
-	err = smtp.SendMail(dto.Email, "Your OTP Code", htmlBody)
+	err = smtp.SendMail(otpDTO.Email, "Your OTP Code", htmlBody)
 	if err != nil {
 		return response.InternalServerException("Failed to send OTP email", err)
 	}
@@ -103,10 +103,10 @@ func RequestOtpService(dto dto.RequestOtpDTO) error {
 	return nil
 }
 
-func VerifyOtpService(dto dto.VerifyOtpDTO) error {
+func VerifyOtpService(verifyDTO dto.VerifyOtpDTO) error {
 	// 1. Check if user exists
 	filter := map[string]interface{}{
-		"email":     strings.ToLower(dto.Email),
+		"email":     strings.ToLower(verifyDTO.Email),
 		"is_active": true,
 	}
 	userDoc, err := db.DB.FindOne(context.Background(), "users", filter)
@@ -129,7 +129,7 @@ func VerifyOtpService(dto dto.VerifyOtpDTO) error {
 	}
 
 	// 3. Compare OTP and reference
-	if !utils.CompareOtpHash(dto.Otp, storedOtpHash) || !utils.CompareOtpReferenceHash(dto.OtpReference, storedRefHash) {
+	if !utils.CompareOtpHash(verifyDTO.Otp, storedOtpHash) || !utils.CompareOtpReferenceHash(verifyDTO.OtpReference, storedRefHash) {
 		return response.BadRequestException("Invalid OTP or reference", nil)
 	}
 
@@ -148,15 +148,15 @@ func VerifyOtpService(dto dto.VerifyOtpDTO) error {
 	return nil
 }
 
-func SetPasswordService(dto dto.SetPasswordDTO) error {
+func SetPasswordService(passwordDTO dto.SetPasswordDTO) error {
 	// 1. Check if passwords match
-	if dto.Password != dto.ConfirmPassword {
+	if passwordDTO.Password != passwordDTO.ConfirmPassword {
 		return response.BadRequestException("Passwords do not match", nil)
 	}
 
 	// 2. Check if user exists
 	filter := map[string]interface{}{
-		"_id":       dto.UserId,
+		"_id":       passwordDTO.UserId,
 		"is_active": true,
 	}
 	userDoc, err := db.DB.FindOne(context.Background(), "users", filter)
@@ -177,7 +177,7 @@ func SetPasswordService(dto dto.SetPasswordDTO) error {
 	}
 
 	// 4. Hash and set password
-	hashedPassword, err := utils.HashOtp(dto.Password) // bcrypt is fine
+	hashedPassword, err := utils.HashOtp(passwordDTO.Password) // bcrypt is fine
 	if err != nil {
 		return response.InternalServerException("Failed to hash password", err)
 	}
@@ -196,10 +196,10 @@ func SetPasswordService(dto dto.SetPasswordDTO) error {
 	return nil
 }
 
-func CompleteProfileService(dto dto.CompleteProfileDTO) error {
+func CompleteProfileService(profileDTO dto.CompleteProfileDTO) error {
 	// 1. Check if user exists
 	filter := map[string]interface{}{
-		"_id":       dto.UserId,
+		"_id":       profileDTO.UserId,
 		"is_active": true,
 	}
 	userDoc, err := db.DB.FindOne(context.Background(), "users", filter)
@@ -212,29 +212,29 @@ func CompleteProfileService(dto dto.CompleteProfileDTO) error {
 
 	// 2. Build update map only with non-empty fields
 	update := map[string]interface{}{}
-	if dto.FullName != "" {
-		update["full_name"] = dto.FullName
+	if profileDTO.FullName != "" {
+		update["full_name"] = profileDTO.FullName
 	}
-	if dto.UserName != "" {
-		update["user_name"] = dto.UserName
+	if profileDTO.UserName != "" {
+		update["user_name"] = profileDTO.UserName
 	}
-	if dto.FirstName != "" {
-		update["first_name"] = dto.FirstName
+	if profileDTO.FirstName != "" {
+		update["first_name"] = profileDTO.FirstName
 	}
-	if dto.LastName != "" {
-		update["last_name"] = dto.LastName
+	if profileDTO.LastName != "" {
+		update["last_name"] = profileDTO.LastName
 	}
-	if dto.PhoneNumber != "" {
-		update["phone_number"] = dto.PhoneNumber
+	if profileDTO.PhoneNumber != "" {
+		update["phone_number"] = profileDTO.PhoneNumber
 	}
-	if dto.CountryCode != "" {
-		update["country_code"] = dto.CountryCode
+	if profileDTO.CountryCode != "" {
+		update["country_code"] = profileDTO.CountryCode
 	}
-	if dto.DialCode != "" {
-		update["dial_code"] = dto.DialCode
+	if profileDTO.DialCode != "" {
+		update["dial_code"] = profileDTO.DialCode
 	}
-	if dto.ProfilePictureUrl != "" {
-		update["profile_picture_url"] = dto.ProfilePictureUrl
+	if profileDTO.ProfilePictureUrl != "" {
+		update["profile_picture_url"] = profileDTO.ProfilePictureUrl
 	}
 
 	if len(update) == 0 {
@@ -253,10 +253,10 @@ func CompleteProfileService(dto dto.CompleteProfileDTO) error {
 	return nil
 }
 
-func LoginUserService(dto dto.LoginDTO) (*dto.LoginResponseDTO, error) {
+func LoginUserService(loginDTO dto.LoginDTO) (*dto.LoginResponseDTO, error) {
 	// 1. Find user by email
 	filter := map[string]interface{}{
-		"email":     strings.ToLower(dto.Email),
+		"email":     strings.ToLower(loginDTO.Email),
 		"is_active": true,
 	}
 	userDoc, err := db.DB.FindOne(context.Background(), "users", filter)
@@ -277,7 +277,7 @@ func LoginUserService(dto dto.LoginDTO) (*dto.LoginResponseDTO, error) {
 	}
 
 	// 2. Compare password (assuming utils.CompareOtpHash works for password)
-	if !utils.CompareOtpHash(dto.Password, storedPassword) {
+	if !utils.CompareOtpHash(loginDTO.Password, storedPassword) {
 		return nil, response.BadRequestException("Invalid credentials", nil)
 	}
 

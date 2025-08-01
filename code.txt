@@ -1,0 +1,4 @@
+go build -o PFBackend ./cmd/main.go
+
+go clean -cache
+go build -o PFBackend ./cmd/main.go

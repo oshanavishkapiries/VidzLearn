@@ -14,7 +14,7 @@ import (
 	"github.com/Cenzios/pf-backend/pkg/firebase"
 	"github.com/Cenzios/pf-backend/pkg/logger"
 	"github.com/Cenzios/pf-backend/pkg/smtp"
-	"github.com/Cenzios/pf-backend/seed"
+	//"github.com/Cenzios/pf-backend/seed"
 )
 
 func main() {
@@ -34,7 +34,7 @@ func main() {
 	smtp.Init()
 
 	// Seed Data
-	seed.Init()
+	//seed.Init()
 
 	// Register router
 	router := routes.RegisterRoutes()

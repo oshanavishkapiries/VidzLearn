@@ -49,7 +49,7 @@ func LoadConfig() *Config {
 		Port:     getEnv("PORT", "8080"),
 		AppName:  getEnv("APP_NAME", "PFBackend"),
 		AppEnv:   getEnv("APP_ENV", "development"),
-		SeedData: getEnv("SEED_DATA", "development"),
+		SeedData: getEnv("SEED_DATA", "true"),
 
 		JWTSecret: getEnv("JWT_SECRET", ""),
 
@@ -87,6 +87,7 @@ func LoadConfig() *Config {
 
 // getEnv returns env value or fallback
 func getEnv(key, fallback string) string {
+
 	if val, ok := os.LookupEnv(key); ok {
 		return val
 	}
